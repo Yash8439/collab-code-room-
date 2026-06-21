@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Backend
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: codesync-server
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGODB_URI=${MONGODB_URI}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    networks:
+      - codesync-network
+    restart: unless-stopped
+
+  # Frontend
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: codesync-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - codesync-network
+    restart: unless-stopped
+
+networks:
+  codesync-network:
+    driver: bridge
